@@ -60,4 +60,8 @@ public class PropertyControllerTest {
     static testMethod void testHello2() {
         System.assertEquals('Hello !', PropertyController.hello());
     }
+
+    static testMethod void testHelloEveryone() {
+        System.assertEquals('Hello !', PropertyController.helloEveryone());
+    }
 }
