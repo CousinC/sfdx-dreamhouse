@@ -14,6 +14,7 @@ node {
     }
 
 	if(env.BRANCH_NAME == "dev") {
+		
 		withCredentials([string(credentialsId: 'CONNECTED_APP_CONSUMER_KEY', variable: 'CONNECTED_APP_CONSUMER_KEY'), string(credentialsId: 'HUB_ORG', variable: 'HUB_ORG'), string(credentialsId: 'SFDC_HOST_DH', variable: 'SFDC_HOST'), file(credentialsId: 'JWT_KEY_FILE', variable: 'jwt_key_file')]) {
 
 			stage('Create Scratch Org') {
@@ -93,39 +94,41 @@ node {
 		}
 	}
 	else if(env.BRANCH_NAME == "staging") {
+
 		withCredentials([string(credentialsId: 'CONNECTED_APP_CONSUMER_KEY_TPO', variable: 'CONNECTED_APP_CONSUMER_KEY'), string(credentialsId: 'TPO_ORG', variable: 'TPO_ORG'), file(credentialsId: 'JWT_KEY_FILE', variable: 'jwt_key_file')]) {
 
-        stage('Authorize Org') {
-            rc = sh returnStatus: true, script: "sfdx force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY} --username ${TPO_ORG} --jwtkeyfile \"${jwt_key_file}\""
-            if (rc != 0) {
-                error 'org authorization failed' 
-            }
-        }
+			stage('Authorize Org') {
+				rc = sh returnStatus: true, script: "sfdx force:auth:jwt:grant --clientid ${CONNECTED_APP_CONSUMER_KEY} --username ${TPO_ORG} --jwtkeyfile \"${jwt_key_file}\""
+				if (rc != 0) {
+					error 'org authorization failed' 
+				}
+			}
 
-	    stage('Convert Source to Metadata API Format') {
-			sh "mkdir mdapioutput"
-	        rc = sh returnStatus: true, script: "force:source:convert --outputdir mdapioutput/"
-	        if (rc != 0) {
-	            error 'convert failed'
-	        }
-	    }
+			stage('Convert Source to Metadata API Format') {
+				sh "mkdir mdapioutput"
+				rc = sh returnStatus: true, script: "force:source:convert --outputdir mdapioutput/"
+				if (rc != 0) {
+					error 'convert failed'
+				}
+			}
 
-		stage('Deploy To The Org') {
-			//run a check-only deployment
-	        rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly true --wait 100 --verbose"
-	        if (rc != 0) {
-	            error 'check-only deployment failed'
-	        }
-		}
+			stage('Deploy To The Org') {
+				//run a check-only deployment
+				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly true --wait 100 --verbose"
+				if (rc != 0) {
+					error 'check-only deployment failed'
+				}
+			}
 
-		stage('Assign Permset') {
-			rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${SFSO_USERNAME} --permsetname DreamHouse"
-	        if (rc != 0) {
-	            error 'permset:assign failed'
-	        }
+			stage('Assign Permset') {
+				rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${SFSO_USERNAME} --permsetname DreamHouse"
+				if (rc != 0) {
+					error 'permset:assign failed'
+				}
 
-			//clean up by deleting the Metadata API folder
-			sh "rm -rf mdapioutput"
+				//clean up by deleting the Metadata API folder
+				sh "rm -rf mdapioutput"
+			}
 		}
 	}
 }
