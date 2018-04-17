@@ -53,12 +53,4 @@ global with sharing class PropertyController {
     public static String helloWorld(){
         return 'HelloWorld !';
     }
-
-    public static String hello(){
-        return 'Hello !';
-    }
-
-    public static String helloEveryone(){
-        return 'Hello !';
-    }
 }
