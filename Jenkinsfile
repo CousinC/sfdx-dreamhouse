@@ -14,7 +14,7 @@ node {
     }
 
 	if(env.BRANCH_NAME == "dev") {
-		
+
 		withCredentials([string(credentialsId: 'CONNECTED_APP_CONSUMER_KEY', variable: 'CONNECTED_APP_CONSUMER_KEY'), string(credentialsId: 'HUB_ORG', variable: 'HUB_ORG'), string(credentialsId: 'SFDC_HOST_DH', variable: 'SFDC_HOST'), file(credentialsId: 'JWT_KEY_FILE', variable: 'jwt_key_file')]) {
 
 			stage('Create Scratch Org') {
@@ -106,7 +106,7 @@ node {
 
 			stage('Convert Source to Metadata API Format') {
 				sh "mkdir mdapioutput"
-				rc = sh returnStatus: true, script: "force:source:convert --outputdir mdapioutput/"
+				rc = sh returnStatus: true, script: "sfdx force:source:convert --outputdir mdapioutput/"
 				if (rc != 0) {
 					error 'convert failed'
 				}
