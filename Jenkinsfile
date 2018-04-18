@@ -105,7 +105,7 @@ node {
 			}
 
 			stage('Convert Source to Metadata API Format') {
-				sh "mkdir mdapioutput"
+				sh "mkdir -p mdapioutput"
 				rc = sh returnStatus: true, script: "sfdx force:source:convert --outputdir mdapioutput/"
 				if (rc != 0) {
 					error 'convert failed'
@@ -121,7 +121,7 @@ node {
 			}
 
 			stage('Assign Permset') {
-				rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${SFSO_USERNAME} --permsetname DreamHouse"
+				rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${TPO_ORG} --permsetname DreamHouse"
 				if (rc != 0) {
 					error 'permset:assign failed'
 				}
