@@ -112,11 +112,18 @@ node {
 				}
 			}
 
-			stage('Deploy To The Org') {
+			stage('Check-Only Deploy') {
 				//run a check-only deployment
 				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly --wait 100"
 				if (rc != 0) {
 					error 'check-only deployment failed'
+				}
+			}
+
+			stage('Deploy To The Org'){
+				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --wait 100"
+				if (rc != 0) {
+					error 'deployment failed'
 				}
 			}
 
