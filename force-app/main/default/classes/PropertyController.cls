@@ -50,11 +50,7 @@ global with sharing class PropertyController {
         }
     }
 
-    public static String helloWorld(){
-        return 'HelloWorld !';
-    }
-
-    public static String hello2(){
-        return 'HelloWorld !';
+    public static String helloWorld() {
+        return 'Hello !';
     }
 }
