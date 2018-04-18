@@ -52,12 +52,4 @@ public class PropertyControllerTest {
 	        System.assert(success);
         }
     }
-
-    static testMethod void testHello() {
-        System.assertEquals('HelloWorld !', PropertyController.helloWorld());
-    }
-
-    static testMethod void testHello2() {
-        System.assertEquals('HelloWorld !', PropertyController.hello2());
-    }
 }
