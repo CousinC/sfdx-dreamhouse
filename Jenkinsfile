@@ -112,7 +112,7 @@ node {
 				}
 			}
 
-			stage('Deploy To The Org') {
+			stage('Check-Only Deploy') {
 				//run a check-only deployment
 				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly --wait 100"
 				if (rc != 0) {
@@ -120,8 +120,15 @@ node {
 				}
 			}
 
+			stage('Deploy To The Org'){
+				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --wait 100"
+				if (rc != 0) {
+					error 'deployment failed'
+				}
+			}
+
 			stage('Assign Permset') {
-				rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${SFSO_USERNAME} --permsetname DreamHouse"
+				rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${TPO_ORG} --permsetname DreamHouse"
 				if (rc != 0) {
 					error 'permset:assign failed'
 				}
