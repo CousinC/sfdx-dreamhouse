@@ -105,7 +105,7 @@ node {
 			}
 
 			stage('Convert Source to Metadata API Format') {
-				sh "mkdir mdapioutput"
+				sh "mkdir -p mdapioutput"
 				rc = sh returnStatus: true, script: "sfdx force:source:convert --outputdir mdapioutput/"
 				if (rc != 0) {
 					error 'convert failed'
