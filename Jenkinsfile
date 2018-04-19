@@ -114,7 +114,7 @@ node {
 
 			stage('Check-Only Deploy') {
 				//run a check-only deployment
-				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly --wait 100"
+				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly --testlevel RunLocalTests --wait 100"
 				if (rc != 0) {
 					error 'check-only deployment failed'
 				}

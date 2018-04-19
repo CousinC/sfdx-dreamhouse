@@ -13,8 +13,6 @@ public class RejectDuplicateFavoriteTest {
                         TimeZoneSidKey='America/Los_Angeles', UserName=getUserNamePrefix() + 'test@test.com');
     }
 
-    /*
-
     static testMethod void acceptNonDuplicate() {
         Boolean success = true;
         try {
@@ -31,8 +29,6 @@ public class RejectDuplicateFavoriteTest {
 	        System.assert(success);
         }
     }
-
-    */
 
     static testMethod void rejectDuplicate() {
         Boolean success = true;
