@@ -102,39 +102,48 @@ node {
 				if (rc != 0) {
 					error 'org authorization failed' 
 				}
-			}
 
-			stage('Convert Source to Metadata API Format') {
+				// creation of the folder used to receive the converted source
 				sh "mkdir -p mdapioutput"
-				rc = sh returnStatus: true, script: "sfdx force:source:convert --outputdir mdapioutput/"
-				if (rc != 0) {
-					error 'convert failed'
-				}
 			}
 
-			stage('Check-Only Deploy') {
-				//run a check-only deployment
-				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly --testlevel RunLocalTests --wait 100"
-				if (rc != 0) {
-					error 'check-only deployment failed'
+			try {
+				stage('Convert Source to Metadata API Format') {
+					rc = sh returnStatus: true, script: "sfdx force:source:convert --outputdir mdapioutput/"
+					if (rc != 0) {
+						error 'convert failed'
+					}
+				}
+
+				stage('Check-Only Deploy') {
+					rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --checkonly --testlevel RunLocalTests --wait 100"
+					if (rc != 0) {
+						error 'check-only deployment failed'
+					}
+				}
+
+				stage('Deploy To The Org'){
+					rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --wait 100"
+					if (rc != 0) {
+						error 'deployment failed'
+					}
+				}
+
+				stage('Assign Permset') {
+					rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${TPO_ORG} --permsetname DreamHouse"
+					if (rc != 0) {
+						error 'permset:assign failed'
+					}
 				}
 			}
-
-			stage('Deploy To The Org'){
-				rc = sh returnStatus: true, script: "sfdx force:mdapi:deploy --deploydir mdapioutput/ --targetusername ${TPO_ORG} --wait 100"
-				if (rc != 0) {
-					error 'deployment failed'
-				}
+			catch (err) {
+				echo "${err}"
+				currentBuild.result = 'FAILURE'
 			}
-
-			stage('Assign Permset') {
-				rc = sh returnStatus: true, script: "sfdx force:user:permset:assign --targetusername ${TPO_ORG} --permsetname DreamHouse"
-				if (rc != 0) {
-					error 'permset:assign failed'
+			finally {
+				stage('Delete The Metadata API Folder'){	
+					sh "rm -rf mdapioutput"
 				}
-
-				//clean up by deleting the Metadata API folder
-				sh "rm -rf mdapioutput"
 			}
 		}
 	}
